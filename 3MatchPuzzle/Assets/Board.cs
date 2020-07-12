@@ -16,6 +16,9 @@ public class Board : MonoBehaviour
     private Tile[,] m_allTiles;
     private GamePiece[,] m_allGamePieces;
 
+    Tile m_clickedTile;
+    Tile m_targetTile;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -44,7 +47,6 @@ public class Board : MonoBehaviour
                         m_allTiles[i, j] = component;
                         m_allTiles[i, j].Init(i, j, this);
                     }
-                    
                 }
             }
         }
@@ -65,7 +67,7 @@ public class Board : MonoBehaviour
     {
         int randomIndex = UnityEngine.Random.Range(0, gamePiecePrefabs.Length);
 
-        if(gamePiecePrefabs[randomIndex] == null)
+        if (gamePiecePrefabs[randomIndex] == null)
         {
             Debug.Log("----> ");
         }
@@ -73,30 +75,76 @@ public class Board : MonoBehaviour
         return gamePiecePrefabs[randomIndex];
     }
 
-    void PlaceGamePiece(GamePiece gamePiece, int x, int y)
+    public void PlaceGamePiece(GamePiece gamePiece, int x, int y)
     {
-        if(gamePiece == null)
+        if (gamePiece == null)
         {
             return;
         }
 
         gamePiece.transform.position = new Vector3(x, y, 0);
         gamePiece.transform.rotation = Quaternion.identity;
+
+        if (IsWithBounds(x, y)) m_allGamePieces[x, y] = gamePiece;
+
         gamePiece.SetCoord(x, y);
     }
 
     void FillRandom()
     {
-        for(int i = 0; i<width; i++)
+        for (int i = 0; i < width; i++)
         {
-            for(int j = 0; j< height; j++)
+            for (int j = 0; j < height; j++)
             {
                 GameObject randomPiece = Instantiate(GetRandomGamePiece(), Vector3.zero, Quaternion.identity) as GameObject;
-                if(randomPiece != null)
+                if (randomPiece != null)
                 {
                     PlaceGamePiece(randomPiece.GetComponent<GamePiece>(), i, j);
+                    randomPiece.GetComponent<GamePiece>().Init(this);
+                    randomPiece.transform.parent = this.transform;
                 }
             }
         }
+    }
+
+    public void ClickTile(Tile tile)
+    {
+        if (m_clickedTile == null)
+        {
+            m_clickedTile = tile;
+            Debug.Log($"----> clicked Tile: {m_clickedTile.name}");
+        }
+    }
+    
+    bool IsWithBounds(int x, int y)
+    {
+        return (x >= 0 && x < width && y >= 0 && y < height);
+    }
+
+    public void DragToTile(Tile tile)
+    {
+        if (m_clickedTile != null)
+            m_targetTile = tile;
+    }
+
+    public void ReleaseTile()
+    {
+        if (m_clickedTile != null && m_targetTile != null)
+        {
+            SwitchTiles(m_clickedTile, m_targetTile);
+        }
+
+        //
+        m_clickedTile = null;
+        m_targetTile = null;
+    }
+
+    private void SwitchTiles(Tile clickedTile, Tile targetTile)
+    {
+        GamePiece clickedPices = m_allGamePieces[clickedTile.xIndex, clickedTile.yIndex];
+        GamePiece targetPieces = m_allGamePieces[targetTile.xIndex, targetTile.yIndex];
+
+        clickedPices.Move(targetTile.xIndex, targetTile.yIndex, 0.5f);
+        targetPieces.Move(clickedTile.xIndex, clickedTile.yIndex, 0.5f);
     }
 }

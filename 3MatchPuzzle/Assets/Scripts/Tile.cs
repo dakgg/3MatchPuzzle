@@ -20,4 +20,28 @@ public class Tile : MonoBehaviour
         yIndex = y;
         m_board = board;
     }
+
+    public void OnMouseDown()
+    {
+        if(m_board != null)
+        {
+            m_board.ClickTile(this);
+        }
+    }
+
+    public void OnMouseEnter()
+    {
+        if(m_board != null)
+        {
+            m_board.DragToTile(this);
+        }
+    }
+
+    public void OnMouseUp()
+    {
+        if (m_board != null)
+        {
+            m_board.ReleaseTile();
+        }
+    }
 }
