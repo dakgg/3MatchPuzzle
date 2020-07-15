@@ -11,6 +11,7 @@ public class GamePiece : MonoBehaviour
 
     bool m_isMoving = false;
     public InterpType interpolation = InterpType.SmootherStep;
+
     public enum InterpType
     {
         Linear,
@@ -18,6 +19,20 @@ public class GamePiece : MonoBehaviour
         EaseIn,
         SmoothStep,
         SmootherStep
+    }
+
+    public MatchValue matchValue;
+    public enum MatchValue
+    {
+        Yellow,
+        Blue,
+        Magenta,
+        Indigo,
+        Green,
+        Teal,
+        Red,
+        Cyan,
+        Wild
     }
 
     // Start is called before the first frame update
@@ -65,8 +80,8 @@ public class GamePiece : MonoBehaviour
             if (Vector3.Distance(transform.position, dest) < 0.01f)
             {
                 reachDest = true;
-                if (m_board != null)
-                    m_board.PlaceGamePiece(this, (int)dest.x, (int)dest.y);
+
+                if (m_board != null) m_board.PlaceGamePiece(this, (int)dest.x, (int)dest.y);
             }
 
             elapsedTime += Time.deltaTime;
@@ -99,4 +114,12 @@ public class GamePiece : MonoBehaviour
         yield break;
     }
 
+    List<GamePiece> FindMatches(int startX, int startY, Vector2 SearchDirection, int minLength = 3)
+    {
+        List<GamePiece> matches = new List<GamePiece>();
+        GamePiece gamePiece;
+
+
+        return matches;
+    }
 }
